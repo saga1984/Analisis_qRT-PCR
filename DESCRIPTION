@@ -1,0 +1,17 @@
+Package: analisisqRTPCR
+Title: Hace Analisis de Expresion de Datos de qRT-PCR, con Estadisticas e Imagenes de Calidad de Publicacion
+Version: 1.0.0.0
+Author: Santiago-Valentin-Galvan-Gordillo galvangosv@gmail.com autor ORCID = 0000-0001-6609-5661
+Description: Toma archivos de corridas de qRT-PCR de genes problema con normalizadores 
+      hechos en un equipo BioRad. filtra, transfroma datos, Obtiene desviaciones estandar,
+      remueve datos anomalos, Hace analisis de ANOVA y Tukey y obtiene nieveles de 
+      expresion relativa (por el metodo de delta delta CT). Guarda tablas en el sistema
+      de directoios y archivos y graficas de calidad de publicacion
+License: GPL-3
+Imports: 
+      tidyverse,
+      readxl
+Depends: R (>=  4.2.2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3

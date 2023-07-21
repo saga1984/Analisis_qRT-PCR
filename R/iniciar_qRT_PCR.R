@@ -1,0 +1,206 @@
+#' @title Filtra y Transforma Datos de las Diferentes Corridas. Obtiene Delta Delta CT y Desviaciones Estandar (ds)
+#'
+#' @description Filtra y transforma datos por corrida
+
+#'
+#' @param ruta Ruta de carpeta origen en winsys
+#' @param archivos Vector de archivos de las diferentes 
+#' @param target Gen problema (por ejemplo cornichon CN1)
+#' @param normalizador Gen normalizador (por ejemplo tubulina, Tb o factor de elongacion, Ef)
+#' @param tratamiento Tratamiento (por ejemplo estres abiotico, NaCl)
+#' @return Obtiene y filtra datos de corridas para analisis de qRT PCR (separados por corrida)
+#'
+#' @export
+
+# primera funcion para analisis de qRT_PCR
+iniciar_qRT_PCR <- function(ruta, 
+                            archivos,
+                            tratamiento, 
+                            target, 
+                            normalizador) {
+  
+  # iterar sobre archivos
+  for (archivo in archivos) {
+    
+    # crear tibble (removiendo espacios en blanco)
+    datos <- read_excel(paste(ruta,"/", archivo, sep = ""), trim_ws = TRUE)
+    
+    # volver data frame
+    datos <- as.data.frame(datos)
+    
+    ############################## filtrado ########################################
+    
+    # filtrar columnas (por nombre)
+    datos <- datos[,c("Target", "Sample", "Biological Set Name", "Content", "Cq")]
+    
+    # eliminar NTC´s, filtrando columna Content
+    datos <- datos[datos[,"Content"] != "NTC",]
+    
+    # definir target y normalizador a conservar
+    target_normalizador <- c(target, normalizador)
+    
+    # eliminar Targets no deseados, filtrando columna Target
+    datos <- subset(datos, Target %in% target_normalizador)
+    
+    # crear nueva columna de ID completo
+    datos$Id <- paste(datos$Target, 
+                      datos$Sample,
+                      datos$`Biological Set Name`)
+    
+    # remover NAs del Id
+    datos$Id <- str_remove(datos$Id, "NA")
+    
+    # dejar solo dos columnas
+    datos <- datos[,c("Id", "Cq")]
+    
+    # ordenar en base a id
+    datos_tmp <- datos[order(datos[,"Id"]),]
+    
+    # eliminar filas raras (1hr y 1 HR)
+    datos_tmp <- datos[!grepl("1hr|1 HR", datos[,"Id"], ignore.case = TRUE), ]
+    
+    # volver Cq una columna de integers
+    datos_tmp$Cq <- as.double(datos_tmp$Cq)
+    
+    # obtener tabla de promedios de Cq (o Ct)
+    promedios <- aggregate(Cq ~ Id, 
+                           data = datos_tmp, 
+                           FUN = mean)  
+    
+    # agregar promedios a cada tipo de fila
+    datos_modificado <- merge(datos_tmp, promedios, by = "Id", all.x = TRUE)
+    
+    # modificar columnas
+    colnames(datos_modificado) <- c("Id", "Cq", "Mean")
+    
+    # agregar columna de error absoluto
+    datos_modificado$err_abs <- abs(datos_modificado$Mean - datos_modificado$Cq)
+    
+    # obtener outliers
+    quitar <- aggregate(err_abs ~ Id, 
+                        data = datos_modificado, 
+                        FUN = max) 
+    
+    # quitar outliers
+    datos <- anti_join(datos_modificado, 
+                       quitar, 
+                       by = "err_abs")
+    
+    # eliminar columnas innecesarias
+    datos <- datos[,c("Id","Cq")]
+    
+    ################################# calculos ###################################
+    
+    ############################# desviacion estandar ##############################
+    
+    # obtener tabla de promedios para graficar
+    desvestas <- aggregate(Cq ~ Id, 
+                           data = datos, 
+                           FUN = sd)
+    
+    # nombrer columnas de desvestas
+    colnames(desvestas) <- c("Id", "sd")
+    
+    # remover espacios en blanco # ya no es necesario
+    # desvestas$Id <- trimws(desvestas$Id)
+    
+    ###################### sd promedio target/normalizador ######################
+    
+    assign(
+      str_replace_all(paste(desvestas$Id[1], desvestas$Id[3], sep = "/"), " ", " "),
+      sqrt((desvestas$sd[1])^2 + (desvestas$sd[3])^2)
+    )
+    
+    assign(
+      str_replace_all(paste(desvestas$Id[2], desvestas$Id[4], sep = "/"), " ", " "),
+      sqrt((desvestas$sd[2])^2 + (desvestas$sd[4])^2)
+    )
+    
+    # guardar todos los elementos del entorno que sean numericos
+    numeric_objects <- Filter(is.numeric, mget(ls()))
+    
+    # unirlos como data frame
+    sd_conjunta <- as.data.frame(do.call(rbind, numeric_objects))
+    
+    # agregar columna de ids
+    sd_conjunta$Id <- rownames(sd_conjunta)
+    
+    # nombrar colummnas
+    colnames(sd_conjunta) <- c("sd", "id")
+    
+    # completar nombre a sd_conjunta para agregar nombre del archivo
+    assign(paste("sd_conjunta", str_remove_all(archivo, ".xlsx"), sep = "_"),
+           sd_conjunta, envir = globalenv())
+    
+    # completar nombre a datos para agregar nombre del archivo
+    assign(paste("datos", str_remove_all(archivo, ".xlsx"), sep = "_"),
+           datos, envir = globalenv())
+    
+    ######################## obtener deltadeltaCT  ###############################
+    
+    # crear nuevo data frame
+    DDCT <- data.frame(matrix(nrow = 2, ncol = 4))
+    
+    # asignar nombre de columnas
+    colnames(DDCT) <- c("DCT_NT", "DCT_T", "DDCT", "exp2DDCT")
+    
+    ##### filtrar datos para delta_NT #####
+    
+    # definir patrones a buscar
+    patron_target <- paste(target, "Ctl", sep = " ")
+    patron_normalizador <- paste(normalizador, "Ctl", sep = " ")
+    
+    # definir vectores logicos de presencia ausencia de patrones
+    vector_logico_targ <- grepl(patron_target, datos$Id)
+    vector_logico_norm <- grepl(patron_normalizador, datos$Id)
+    
+    # llenar datos de columna DCT_NT
+    DDCT[,"DCT_NT"] <- datos$Cq[vector_logico_targ] - datos$Cq[vector_logico_norm]
+    
+    ##### filtrar datos para delta_T #####
+    
+    # definir patrones a buscar
+    patron_target <- paste(target, tratamiento, sep = " ")
+    patron_normalizador <- paste(normalizador, tratamiento, sep = " ")
+    
+    # definir vectores logicos de presencia ausencia de patrones
+    vector_logico_targ <- grepl(patron_target, datos$Id)
+    vector_logico_norm <- grepl(patron_normalizador, datos$Id)
+    
+    # llenar datos de columna DCT_T
+    DDCT[, "DCT_T"] <- datos$Cq[vector_logico_targ] - datos$Cq[vector_logico_norm]
+    
+    # llenar datos de columna DCT_T
+    DDCT[, "DDCT"] <- DDCT$DCT_T - DDCT$DCT_NT
+    
+    # llenar datos de columna exp2DDCT
+    DDCT[, "exp2DDCT"] <- 2^(-DDCT$DDCT)
+    
+    # definir nombre filas
+    nombreFilas <- paste(str_remove(archivo, ".xlsx"), 
+                         paste(target, normalizador, sep = "_"),
+                         sep = "_")
+    
+    # asiganr nombre filas
+    DDCT$ID <- nombreFilas
+    
+    # nombre largo
+    assign(paste("DDCT",
+                 str_remove(archivo, ".xlsx"), 
+                 paste(target, normalizador, sep = "_"),
+                 sep = "_"), 
+           DDCT, envir = globalenv())
+    
+    ######################### crear directorio #################################
+    
+    # asignar subcarpeta para guardar posteriores resultados
+    directorio_final <- paste(
+      ruta, "/", str_remove_all(archivo1, "_corrida[12]|.xlsx"), 
+      "_", target, "_", normalizador,
+      sep = "")
+
+    # crear directorio
+    dir.create(directorio_final)
+    
+  }
+}
