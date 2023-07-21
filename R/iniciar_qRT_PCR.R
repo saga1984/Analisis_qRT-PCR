@@ -8,6 +8,7 @@
 #' @param target Gen problema (por ejemplo cornichon CN1)
 #' @param normalizador Gen normalizador (por ejemplo tubulina, Tb o factor de elongacion, Ef)
 #' @param tratamiento Tratamiento (por ejemplo estres abiotico, NaCl)
+#' @param tratamiento_condicion Tratamiento y condicion (por ejemplo: Tratamiento: NaCl. Condicion: 3h)
 #' @return Obtiene y filtra datos de corridas para analisis de qRT PCR (separados por corrida)
 #'
 #' @export
@@ -15,7 +16,8 @@
 # primera funcion para analisis de qRT_PCR
 iniciar_qRT_PCR <- function(ruta, 
                             archivos,
-                            tratamiento, 
+                            tratamiento,
+                            tratamiento_condicion,
                             target, 
                             normalizador) {
   
@@ -195,9 +197,7 @@ iniciar_qRT_PCR <- function(ruta,
     
     # asignar subcarpeta para guardar posteriores resultados
     directorio_final <- paste(
-      ruta, "/", str_remove_all(archivo1, "_corrida[12]|.xlsx"), 
-      "_", target, "_", normalizador,
-      sep = "")
+      ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
 
     # crear directorio
     dir.create(directorio_final)
