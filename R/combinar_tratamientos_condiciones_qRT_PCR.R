@@ -95,7 +95,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     for(i in formatos) {
       
       # crear y guardar los heatmaps
-      match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",normalizador, tratamiento_condiciones, ".", i, sep = ""),
+      match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",normalizador, "_", tratamiento_condiciones, ".", i, sep = ""),
                    res = 300,
                    width = 5000,
                    height = 7000)
