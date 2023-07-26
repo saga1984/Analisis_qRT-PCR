@@ -109,8 +109,8 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                  fill = grupo)) +
           geom_bar(stat = "identity", position = "stack") +
           # barras de error
-          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
-                                      ymax = exp2DDCT_promedio + error/2),
+          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error,
+                                      ymax = exp2DDCT_promedio + error),
                         width=.2,
                         position=position_dodge(.9)) +
           theme_minimal() +
