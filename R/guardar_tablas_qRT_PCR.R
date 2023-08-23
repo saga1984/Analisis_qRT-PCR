@@ -23,10 +23,13 @@ guardar_tablas_qRT_PCR <- function(ruta,
                                    normalizador){
   
   # asignar subcarpeta para guardar resultados
-  directorio_final <- paste(
-    ruta, "/", tratamiento_condicion, 
-    "_", target, "_", normalizador,
-    sep = "")
+  if(length(normalizador) > 1){
+    directorio_final <- paste(
+      ruta, "/", "SuperEndogeno_", tratamiento_condicion, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
+  } else {
+    directorio_final <- paste(
+      ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
+  }
   
   if (dir.exists(directorio_final)) {
   
