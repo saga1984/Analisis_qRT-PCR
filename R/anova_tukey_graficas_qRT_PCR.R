@@ -26,7 +26,6 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ################################# ANOVA ########################################
   
   # asignar subcarpeta para guardar resultados
- fdisk
   
   # obtener ANOVA para funcion
   anova_DDCT_combinados <- aov(exp2DDCT_promedio ~ ID, 
