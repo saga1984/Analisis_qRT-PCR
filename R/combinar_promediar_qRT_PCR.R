@@ -13,10 +13,10 @@
 #'
 #' @export
 
-
 # segunda funcion para analisis de qRT PCR
 combinar_promediar_qRT_PCR <- function(ruta,
                                        target,
+                                       tratamiento,
                                        normalizador){
   
   # guardar objeto de nombres de data frames de desviaciones
@@ -65,7 +65,55 @@ combinar_promediar_qRT_PCR <- function(ruta,
   datos_combinados_promedio <<- aggregate(x = Cq ~ Id,
                                           data = datos_combinados_func,
                                           FUN = mean)
-
+  
+  # obtener nuevas desviaciones estandar
+  datos_combinados_promedio_sd <- aggregate(x = Cq ~ Id,
+                                            data = datos_combinados_func,
+                                            FUN = sd)
+  
+  # asignar nombres de columnas
+  colnames(datos_combinados_promedio_sd) <- c("id", "sd")
+  
+  ###################### sd promedio target/normalizador ######################
+  
+  assign(
+    str_replace_all(paste(datos_combinados_promedio_sd$id[grepl("Ctl", datos_combinados_promedio_sd$id)], collapse = "/"), 
+                    " ", "_"),
+    sqrt((datos_combinados_promedio_sd$sd[grepl("Ctl", datos_combinados_promedio_sd$id)][1])^2 + 
+           (datos_combinados_promedio_sd$sd[grepl("Ctl", datos_combinados_promedio_sd$id)][2])^2)
+  )
+  
+  assign(
+    str_replace_all(paste(datos_combinados_promedio_sd$id[grepl(paste(target, tratamiento, sep = " "), datos_combinados_promedio_sd$id)], 
+                          datos_combinados_promedio_sd$id[grepl(paste(paste(normalizador, collapse = " "), tratamiento, sep = " "), datos_combinados_promedio_sd$id)], sep = "/"), 
+                    " ", "_"),
+    sqrt((datos_combinados_promedio_sd$sd[grepl(paste(target, tratamiento, sep = " "), datos_combinados_promedio_sd$id)])^2 + 
+           (datos_combinados_promedio_sd$sd[grepl(paste(paste(normalizador, collapse = " "), tratamiento, sep = " "), datos_combinados_promedio_sd$id)])^2)
+  )
+  
+  # obtener objetos de interes (desvestas combinadas)
+  nuevas_desvestas <- mget(ls()[grepl("/", ls())])
+  
+  # volver data frame asignando nombre de columna
+  nuevas_desvestas_combinadas <- data.frame(sd = do.call(rbind, nuevas_desvestas))
+  
+  # crear columna de id
+  nuevas_desvestas_combinadas$id <- row.names(nuevas_desvestas_combinadas)
+  
+  # unir desviaciones estandar 
+  ds_combinadas_promedio <- rbind(nuevas_desvestas_combinadas, sd_combinados_promedio)
+  
+  # volver global
+  sd_combinados <<- ds_combinadas_promedio
+  
+  # promediar 
+  ds_combinadas_promedio_completo <- aggregate(sd ~ id, 
+                                               data = ds_combinadas_promedio, 
+                                               FUN = mean)
+  # cambiar nombre
+  sd_combinados_promedio <<- ds_combinadas_promedio_completo
+  
+  
   ######################## promediar/combinar datos DDCT ########################
   
   # clave datos
@@ -85,11 +133,11 @@ combinar_promediar_qRT_PCR <- function(ruta,
   # eliminar columna de ID de cada df
   corrida_1 <- corrida1[, "exp2DDCT"]
   corrida_2 <- corrida2[, "exp2DDCT"]
-    
+  
   # obtener promedios de ambas corridas en expr2^DDCT
   DDCT_combinados <- data.frame(
     exp2DDCT_promedio = rowMeans(cbind(corrida_1, corrida_2))
-    )
+  )
   
   # agregar ID
   DDCT_combinados$ID <- str_remove(corrida1$ID[1], "_corrida1") 
@@ -99,7 +147,7 @@ combinar_promediar_qRT_PCR <- function(ruta,
   
   # volver global
   DDCT_combinados <<- DDCT_combinados 
-   
+  
   ############################ agregar controles ###############################
   
   # crear data frame de controles

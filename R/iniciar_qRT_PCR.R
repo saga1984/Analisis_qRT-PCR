@@ -91,6 +91,75 @@ iniciar_qRT_PCR <- function(ruta,
     # eliminar columnas innecesarias
     datos <- datos[,c("Id","Cq")]
     
+    if(length(normalizador) > 1){
+      ############## promediar para obtener super endogeno #######################
+      
+      ##### definir patrones a buscar con Ctl #####
+      patron_normalizador <- paste(normalizador, "Ctl", sep = " ")
+      
+      # definir vectores logicos de presencia ausencia de patrones
+      vector_logico_norm_1 <- grepl(paste(patron_normalizador, collapse = "|"), 
+                                    datos$Id)
+      
+      # obtener subset de vector para promediar
+      datos1 <- datos[vector_logico_norm_1,]
+      
+      # obtener promedios de pares
+      pares1 <- mean(datos1$Cq[1:nrow(datos1) %% 2 == 0])
+      # obtener promedios de impares
+      impares1 <- mean(datos1$Cq[1:nrow(datos1) %% 2 != 0])
+      
+      # unir promedios de pares e impares
+      promedios1 <- data.frame(Cq = rbind(pares1, impares1))
+      
+      # agregar columna de Id 
+      promedios1$Id <- paste(paste(normalizador, collapse = " "), "Ctl", 
+                             sep = " ")
+      
+      ####### definir patrones a buscar con tratamientos ######
+      patron_normalizador <- paste(normalizador, tratamiento, sep = " ")
+      
+      # definir vectores logicos de presencia ausencia de patrones
+      vector_logico_norm_2 <- grepl(paste(patron_normalizador, collapse = "|"), 
+                                    datos$Id)
+      
+      # obtener subset de vector para promediar
+      datos2 <- datos[vector_logico_norm_2,]
+      
+      # obtener promedios de pares
+      pares2 <- mean(datos2$Cq[1:nrow(datos2) %% 2 == 0])
+      # obtener promedios de impares
+      impares2 <- mean(datos2$Cq[1:nrow(datos2) %% 2 != 0])
+      
+      # unir promedios de pares e impares
+      promedios2 <- data.frame(Cq = rbind(pares2, impares2))
+      
+      # agregar columna de Id 
+      promedios2$Id <- paste(paste(normalizador, collapse = " "), tratamiento, 
+                             sep = " ")
+      
+      # union final
+      super_endogeno <- rbind(promedios1, promedios2)
+      
+      # asignar nombre de filas de super endogeno
+      # row.names(super_endogeno) <- super_endogeno$Id
+      
+      ################ filas de datos que contienen al target #################
+      datos_target <- datos[grepl(target, datos$Id),]
+      
+      ################ unir final super endpgeno y target #####################
+      datos <- rbind(datos_target, super_endogeno)
+      
+      # remover super endogeno
+      rm(super_endogeno)
+      
+      # filtrar elementos a remover
+      objects_remove <- ls()[grepl("pares", ls())]
+      
+      # remover elementos numerics
+      rm(list = objects_remove)
+    }
+    
     ################################# calculos ###################################
     
     ############################# desviacion estandar ##############################
@@ -109,13 +178,18 @@ iniciar_qRT_PCR <- function(ruta,
     ###################### sd promedio target/normalizador ######################
     
     assign(
-      str_replace_all(paste(desvestas$Id[1], desvestas$Id[3], sep = "/"), " ", " "),
-      sqrt((desvestas$sd[1])^2 + (desvestas$sd[3])^2)
+      str_replace_all(paste(desvestas$Id[grepl("Ctl", desvestas$Id)], collapse = "/"), 
+                      " ", "_"),
+      sqrt((desvestas$sd[grepl("Ctl", desvestas$Id)][1])^2 + 
+             (desvestas$sd[grepl("Ctl", desvestas$Id)][2])^2)
     )
     
     assign(
-      str_replace_all(paste(desvestas$Id[2], desvestas$Id[4], sep = "/"), " ", " "),
-      sqrt((desvestas$sd[2])^2 + (desvestas$sd[4])^2)
+      str_replace_all(paste(desvestas$Id[grepl(paste(target, tratamiento, sep = " "), desvestas$Id)], 
+                            desvestas$Id[grepl(paste(paste(normalizador, collapse = " "), tratamiento, sep = " "), desvestas$Id)], sep = "/"), 
+                      " ", "_"),
+      sqrt((desvestas$sd[grepl(paste(target, tratamiento, sep = " "), desvestas$Id)])^2 + 
+             (desvestas$sd[grepl(paste(paste(normalizador, collapse = " "), tratamiento, sep = " "), desvestas$Id)])^2)
     )
     
     # guardar todos los elementos del entorno que sean numericos
@@ -150,7 +224,9 @@ iniciar_qRT_PCR <- function(ruta,
     
     # definir patrones a buscar
     patron_target <- paste(target, "Ctl", sep = " ")
-    patron_normalizador <- paste(normalizador, "Ctl", sep = " ")
+    patron_normalizador <- paste(paste(normalizador, collapse = " "), 
+                                 "Ctl", 
+                                 sep = " ")
     
     # definir vectores logicos de presencia ausencia de patrones
     vector_logico_targ <- grepl(patron_target, datos$Id)
@@ -163,7 +239,9 @@ iniciar_qRT_PCR <- function(ruta,
     
     # definir patrones a buscar
     patron_target <- paste(target, tratamiento, sep = " ")
-    patron_normalizador <- paste(normalizador, tratamiento, sep = " ")
+    patron_normalizador <- paste(paste(normalizador, collapse = " "), 
+                                 tratamiento, 
+                                 sep = " ")
     
     # definir vectores logicos de presencia ausencia de patrones
     vector_logico_targ <- grepl(patron_target, datos$Id)
@@ -189,7 +267,7 @@ iniciar_qRT_PCR <- function(ruta,
     # nombre largo
     assign(paste("DDCT",
                  str_remove(archivo, ".xlsx"), 
-                 paste(target, normalizador, sep = "_"),
+                 paste(target, paste(normalizador, collapse = "_"), sep = "_"),
                  sep = "_"), 
            DDCT, envir = globalenv())
     
@@ -197,8 +275,14 @@ iniciar_qRT_PCR <- function(ruta,
     
     # asignar subcarpeta para guardar posteriores resultados
     directorio_final <- paste(
-      ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
-
+      ruta, "/", 
+      tratamiento_condicion, 
+      "_", 
+      target, 
+      "_",
+      paste(normalizador, collapse = "_"), 
+      sep = "")
+    
     # crear directorio
     dir.create(directorio_final)
     
