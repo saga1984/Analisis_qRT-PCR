@@ -15,7 +15,6 @@
 #' @export
 
 
-
 # tercera funcion para analisis de qRT PCR
 anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          tratamiento_condicion,
@@ -149,8 +148,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   error <- data.frame(matrix(nrow = 2, ncol = 1))
   
   # indices de tratamiento. control
-  TARGET <- which(grepl(paste(target, tratamiento), sd_combinados_promedio$id))
-  CNTRL <- which(grepl(paste(target, "Ctl"), sd_combinados_promedio$id))
+  TARGET <- which(grepl(paste(target, tratamiento, sep = "_"), sd_combinados_promedio$id))
+  CNTRL <- which(grepl(paste(target, "Ctl", sep = "_"), sd_combinados_promedio$id))
   
   # definir indices para agrupar
   error[TARGET,] <- sd_combinados_promedio$sd[TARGET]
