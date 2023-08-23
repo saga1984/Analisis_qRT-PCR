@@ -26,6 +26,13 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ################################# ANOVA ########################################
   
   # asignar subcarpeta para guardar resultados
+  if(length(normalizador) > 1){
+    directorio_final <- paste(
+      ruta, "/", "SuperEndogeno_", tratamiento_condicion, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
+  } else {
+    directorio_final <- paste(
+      ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
+  }
   
   # obtener ANOVA para funcion
   anova_DDCT_combinados <- aov(exp2DDCT_promedio ~ ID, 
