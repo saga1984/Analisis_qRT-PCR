@@ -15,6 +15,7 @@
 #' @export
 
 
+
 # tercera funcion para analisis de qRT PCR
 anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          tratamiento_condicion,
@@ -25,8 +26,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ################################# ANOVA ########################################
   
   # asignar subcarpeta para guardar resultados
-  directorio_final <- paste(
-    ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
+ fdisk
   
   # obtener ANOVA para funcion
   anova_DDCT_combinados <- aov(exp2DDCT_promedio ~ ID, 
@@ -44,7 +44,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                              "summary_anova_", 
                              target, 
                              "_",
-                             normalizador, 
+                             paste(normalizador, collapse = "_"), 
                              ".txt", 
                              sep = ""), 
                 sep = "\t",
@@ -53,8 +53,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   }
   
   cat(paste("Se acaban de guardar lel resultado de anova de: ",
-              target, " ",normalizador, " ", tratamiento_condicion,  
-              "en:\n", directorio_final, "\n\n",sep = ""))
+              target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condicion,  
+              " en:\n", directorio_final, "\n\n",sep = ""))
   
   ################################# TUKEY ########################################
   
@@ -80,7 +80,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                          "Tukey_", 
                          target, 
                          "_",
-                         normalizador, 
+                         paste(normalizador, collapse = "_"), 
                          ".", i, sep = ""),
                    res = 600,
                    width = 10000,
@@ -92,7 +92,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
              cex.axis=1.1,
              las = 3,
              col = "blue",
-             sub = paste("tratamiento vs control", target, normalizador, sep = " "),
+             sub = paste("tratamiento vs control", target, paste(normalizador, collapse = "_"), sep = " "),
              xlim = c((ymin - 1), (ymax + 1))
         )
       )
@@ -105,7 +105,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   }
   
   cat(paste("Se acaban de guardar la grafica de Tukey de: ",
-              target, " ", normalizador, " ", tratamiento_condicion,
+              target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condicion,
               " en:\n", directorio_final, "\n\n",sep = ""))
   
   ##############################################################################
@@ -161,7 +161,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                tratamiento_condicion, 
                "_", target, 
                "_", 
-               normalizador, 
+               paste(normalizador, collapse = "_"), 
                sep = ""),
          promedio_grafica, envir = globalenv())
   
@@ -182,8 +182,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
     # guardar imagen en formatos pre-establecidos
     for(i in formatos) {
       
-      # crear y guardar los heatmaps
-      match.fun(i)(paste(directorio_final, "/", "plot_", target, "_",normalizador, ".", i, sep = ""),
+      # crear y guardar graficas de expresion relativa
+      match.fun(i)(paste(directorio_final, "/", "plot_", target, "_", paste(normalizador, collapse = "_"), ".", i, sep = ""),
                    res = 300,
                    width = 5000,
                    height = 7000)
@@ -197,8 +197,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                  fill = grupo)) +
           geom_bar(stat = "identity", position = "stack") +
           # barras de error
-          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error,
-                                      ymax = exp2DDCT_promedio + error),
+          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
+                                      ymax = exp2DDCT_promedio + error/2),
                         width=.2,
                         position=position_dodge(.9)) +
           theme_minimal() +
@@ -214,8 +214,9 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
     }
     
     cat(paste("Se acaban de guardar la grafica de expresion relativa de: ",
-              target, " ",normalizador, " ", tratamiento_condicion, " en:\n",
-              directorio_final, "\n\n",sep = ""))
+              target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condicion, " en:\n",
+              directorio_final, "\n\n", sep = ""))
   }
   
 }
+

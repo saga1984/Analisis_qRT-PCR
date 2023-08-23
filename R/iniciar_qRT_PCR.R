@@ -274,14 +274,13 @@ iniciar_qRT_PCR <- function(ruta,
     ######################### crear directorio #################################
     
     # asignar subcarpeta para guardar posteriores resultados
-    directorio_final <- paste(
-      ruta, "/", 
-      tratamiento_condicion, 
-      "_", 
-      target, 
-      "_",
-      paste(normalizador, collapse = "_"), 
-      sep = "")
+    if(length(normalizador) > 1){
+      directorio_final <- paste(
+        ruta, "/", "SuperEndogeno_", tratamiento_condicion, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
+    } else {
+      directorio_final <- paste(
+        ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
+    }
     
     # crear directorio
     dir.create(directorio_final)
