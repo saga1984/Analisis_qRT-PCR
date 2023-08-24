@@ -26,7 +26,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   # asignar subcarpeta para guardar resultados
   if(length(normalizador > 1)){
     directorio_tratamientos <- paste(
-      ruta_carpeta, "/", tratamiento_condiciones, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
+      ruta_carpeta, "/", "SuperEndogeno_", tratamiento_condiciones, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
   } else {
     directorio_tratamientos <- paste(
       ruta_carpeta, "/", tratamiento_condiciones, "_", target, "_", normalizador, sep = "")
@@ -115,8 +115,8 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                  fill = grupo)) +
           geom_bar(stat = "identity", position = "stack") +
           # barras de error
-          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error,
-                                      ymax = exp2DDCT_promedio + error),
+          geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
+                                      ymax = exp2DDCT_promedio + error/2),
                         width=.2,
                         position=position_dodge(.9)) +
           theme_minimal() +
