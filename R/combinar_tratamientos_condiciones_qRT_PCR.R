@@ -24,9 +24,15 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   ##### crear subcarpeta para guardar resultadso de tratamientos condiciones #####
   
   # asignar subcarpeta para guardar resultados
-  directorio_tratamientos <- paste(
-    ruta_carpeta, "/", tratamiento_condiciones, "_", target, "_", normalizador, sep = "")
+  if(length(normalizador > 1)){
+    directorio_tratamientos <- paste(
+      ruta_carpeta, "/", tratamiento_condiciones, "_", target, "_", paste(normalizador, collapse = "_"), sep = "")
+  } else {
+    directorio_tratamientos <- paste(
+      ruta_carpeta, "/", tratamiento_condiciones, "_", target, "_", normalizador, sep = "")
+  }
   
+  # si el directorio de tratamientos existe
   if (!dir.exists(directorio_tratamientos)){
     dir.create(directorio_tratamientos)
   }
@@ -95,7 +101,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     for(i in formatos) {
       
       # crear y guardar los heatmaps
-      match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",normalizador, "_", tratamiento_condiciones, ".", i, sep = ""),
+      match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condiciones, ".", i, sep = ""),
                    res = 300,
                    width = 5000,
                    height = 7000)
@@ -126,7 +132,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     }
     
     cat(paste("Se guardó la grafica de expresion relativa de: ",
-                target, " ",normalizador, " ", tratamiento_condiciones, " en:\n",
+                target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condiciones, " en:\n",
                 directorio_tratamientos,
                 sep = "", collapse = "\n"))
   }
@@ -199,7 +205,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   }
 
   cat(paste("Se acaban de guardar lel resultado de anova de: ",
-            target, " ",normalizador, " ", tratamiento_condiciones,
+            target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condiciones,
             " en:\n", directorio_tratamientos, sep = ""))
 
   ################################ hacer tukey ################################
@@ -233,7 +239,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
              cex.axis=1.1,
              las = 3,
              col = "blue",
-             sub = paste("tratamiento vs control", target, normalizador, sep = " "),
+             sub = paste("tratamiento vs control", target, paste(normalizador, collapse = " "), sep = " "),
              xlim = c((ymin - 1), (ymax + 1))
         )
       )
@@ -246,7 +252,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   }
 
   cat(paste("Se acaban de guardar lel resultado de tukey de: ",
-            target, " ",normalizador, " ", tratamiento_condiciones,
+            target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condiciones,
             " en:\n", directorio_tratamientos, sep = ""))
 
   ######################## guardar objetos combinados ##########################
