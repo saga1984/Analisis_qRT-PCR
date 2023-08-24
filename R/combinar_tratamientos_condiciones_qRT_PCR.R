@@ -282,7 +282,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   tablas <- ls(envir = parent.frame())
   
   # eliminar todos los elementos de df_names
-  rm(list = df_names, envir = parent.frame())
+  rm(list = tablas, envir = parent.frame())
   
   # imprimir que se hizo
   cat(paste("Se guardo el archivo:\n", tablas, "\n en: ", directorio_tratamientos, sep = ""))
