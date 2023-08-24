@@ -258,7 +258,7 @@ iniciar_qRT_PCR <- function(ruta,
     
     # definir nombre filas
     nombreFilas <- paste(str_remove(archivo, ".xlsx"), 
-                         paste(target, normalizador, sep = "_"),
+                         paste(target, paste(normalizador, collapse = "_"), sep = "_"),
                          sep = "_")
     
     # asiganr nombre filas
