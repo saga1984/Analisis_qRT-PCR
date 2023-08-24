@@ -276,4 +276,14 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
               directorio_tratamientos, "\n\n",sep = ""))
   }
   
+  ############# remover archivos, menos algunos seleccionados) ###############
+  
+  # eliminar todas las funciones de df_names
+  tablas <- ls(envir = parent.frame())
+  
+  # eliminar todos los elementos de df_names
+  rm(list = df_names, envir = parent.frame())
+  
+  # imprimir que se hizo
+  cat(paste("Se guardo el archivo:\n", tablas, "\n en: ", directorio_tratamientos, sep = ""))
 }
