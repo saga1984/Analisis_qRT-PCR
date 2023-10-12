@@ -20,10 +20,9 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          tratamiento_condicion,
                                          target,
                                          normalizador,
-                                         tratamiento){
+                                         tratamiento,
+                                         formatos = "tiff"){
 
-  ################################# ANOVA ########################################
-  
   # asignar subcarpeta para guardar resultados
   if(length(normalizador) > 1){
     directorio_final <- paste(
@@ -32,86 +31,6 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
     directorio_final <- paste(
       ruta, "/", tratamiento_condicion, "_", target, "_", normalizador, sep = "")
   }
-  
-  # obtener ANOVA para funcion
-  anova_DDCT_combinados <- aov(exp2DDCT_promedio ~ ID, 
-                               data = DDCT_combinados_finales)
-  
-  # guardar texto de resultado de analisis de anova
-  summary_anova_DDCT_combinados <- capture.output(summary(anova_DDCT_combinados))
-  
-  # si subdirectorio existe
-  if (dir.exists(directorio_final)) {
-    # guardar ANOVA en winsys
-    write.table(summary_anova_DDCT_combinados, 
-                file = paste(directorio_final, 
-                             "/",
-                             "summary_anova_", 
-                             target, 
-                             "_",
-                             paste(normalizador, collapse = "_"), 
-                             ".txt", 
-                             sep = ""), 
-                sep = "\t",
-                row.names = FALSE, 
-                col.names = FALSE)
-  }
-  
-  cat(paste("Se acaban de guardar lel resultado de anova de: ",
-              target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condicion,  
-              " en:\n", directorio_final, "\n\n",sep = ""))
-  
-  ################################# TUKEY ########################################
-  
-  # hacer prueba de tukey
-  tukey_DDCT_combinados <- TukeyHSD(x = anova_DDCT_combinados, conf.level = 0.95)
-
-  ymin <- min(anova_DDCT_combinados$effects)
-  ymax <- max(anova_DDCT_combinados$coefficients)
-    
-  # si existe subdirectorio
-  if (dir.exists(directorio_final)) {
-    
-    # definir formatos
-    # formatos <- c("tiff", "jpeg")
-    formatos <- c("jpeg")
-    
-    # guardar imagen en formatos pre-establecidos
-    for(i in formatos) {
-      
-      # crear y guardar los heatmaps
-      match.fun(i)(paste(directorio_final, 
-                         "/",
-                         "Tukey_", 
-                         target, 
-                         "_",
-                         paste(normalizador, collapse = "_"), 
-                         ".", i, sep = ""),
-                   res = 600,
-                   width = 10000,
-                   height = 14000)
-      # crear y guardar el heatmpat euclidean
-      print(
-        
-        plot(x = tukey_DDCT_combinados,
-             cex.axis=1.1,
-             las = 3,
-             col = "blue",
-             sub = paste("tratamiento vs control", target, paste(normalizador, collapse = "_"), sep = " "),
-             xlim = c((ymin - 1), (ymax + 1))
-        )
-      )
-      #linea roja en x = 0
-      abline(v = 0, col="red")
-      
-      dev.off()
-      
-    }
-  }
-  
-  cat(paste("Se acaban de guardar la grafica de Tukey de: ",
-              target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condicion,
-              " en:\n", directorio_final, "\n\n",sep = ""))
   
   ##############################################################################
   ################################# graficar ###################################
@@ -160,6 +79,9 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   
   # unir data frames 
   promedio_grafica <- cbind(promedio_grafica, error)
+
+  # volver global
+  promedio_grafica_global <<- promedio_grafica
   
   # crear tabla final para graficar con nombre largo
   assign(paste("tabla_grafica_", 
@@ -178,10 +100,6 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   # encontrar el valor del eje y mas alto
   ymax <- max(maximos)
   
-  # definir formatos
-  # formatos <- c("tiff", "jpeg")
-  formatos <- c("jpeg")
-  
   # si existe el subdirectorio
   if (dir.exists(directorio_final)) {
     # guardar imagen en formatos pre-establecidos
@@ -189,7 +107,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
       
       # crear y guardar graficas de expresion relativa
       match.fun(i)(paste(directorio_final, "/", "plot_", target, "_", paste(normalizador, collapse = "_"), ".", i, sep = ""),
-                   res = 300,
+                   res = 400,
                    width = 5000,
                    height = 7000)
       # crear y guardar el heatmpat euclidean
@@ -222,6 +140,139 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
               target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condicion, " en:\n",
               directorio_final, "\n\n", sep = ""))
   }
+
+  ##############################################################################
+  ############### modificar data frame para estadisticos #######################
+  ##############################################################################
   
+  ##### preparar df #####
+  
+  # vector de nombre de columnas
+  nombres_col <- c("id", "grupo", "exp_relat")
+  
+  # vector de numero de filas
+  numero_fil <- nrow(promedio_grafica_global) * 3
+  
+  # crear nuevo df
+  estadistica_df <- as.data.frame(matrix(ncol = length(nombres_col), 
+                                         nrow = numero_fil)
+  )
+  
+  # asignar nombres de columnas
+  colnames(estadistica_df) <- nombres_col
+  
+  ################### crear nuevo df para estadisticos ########################
+  
+  # poblar primeras dos columnas del data frame estadistica
+  for(i in 1:nrow(promedio_grafica_global)){
+    for(j in 1:3){
+      # crear indices para estadistica_df
+      index <- (i - 1) * 3 + j
+      
+      # poblar primeras dos columnas de estadistica_df
+      estadistica_df[index, "id"] <- promedio_grafica_global$ID[i]
+      estadistica_df[index, "grupo"] <- promedio_grafica_global$grupo[i]
+      
+    }
+  }
+  
+  # crear nueva columna (exp_relat) aparte del estadistica df
+  # crear vector vacio
+  expresiones_relativas <- numeric()
+  
+  # iterar sobre las columnas de df de graficas
+  for (i in 1:nrow(promedio_grafica_global)) {
+    # append cada nuevo valor al vector de expresiones_relativas
+    expresiones_relativas <- c(expresiones_relativas,
+                               promedio_grafica_global[,"exp2DDCT_promedio"][i] + promedio_grafica_global$error[i]/2,
+                               promedio_grafica_global[,"exp2DDCT_promedio"][i],
+                               promedio_grafica_global[,"exp2DDCT_promedio"][i] - promedio_grafica_global$error[i]/2
+    )
+  }
+  
+  # poblar tercera columna del nuevo df para estadisticos
+  estadistica_df[,"exp_relat"] <- expresiones_relativas
+  
+  # volver global
+  estadistica_df_global <<- estadistica_df
+  
+  ################################# ANOVA ########################################
+  
+  
+  # obtener ANOVA para funcion
+  anova_DDCT_combinados <- aov(exp_relat ~ id, 
+                               data = estadistica_df)
+  
+  # guardar texto de resultado de analisis de anova
+  summary_anova_DDCT_combinados <- capture.output(summary(anova_DDCT_combinados))
+  
+  # si subdirectorio existe
+  if (dir.exists(directorio_final)) {
+    # guardar ANOVA en winsys
+    write.table(summary_anova_DDCT_combinados, 
+                file = paste(directorio_final, 
+                             "/",
+                             "summary_anova_", 
+                             target, 
+                             "_",
+                             paste(normalizador, collapse = "_"), 
+                             ".txt", 
+                             sep = ""), 
+                sep = "\t",
+                row.names = FALSE, 
+                col.names = FALSE)
+  }
+  
+  cat(paste("Se acaban de guardar lel resultado de anova de: ",
+            target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condicion,  
+            " en:\n", directorio_final, "\n\n",sep = ""))
+  
+  ################################# TUKEY ########################################
+  
+  # hacer prueba de tukey
+  tukey_DDCT_combinados <- TukeyHSD(x = anova_DDCT_combinados, conf.level = 0.95)
+  
+  ymin <- min(anova_DDCT_combinados$effects)
+  ymax <- max(anova_DDCT_combinados$coefficients)
+  
+  # si existe subdirectorio
+  if (dir.exists(directorio_final)) {
+    
+    # guardar imagen en formatos pre-establecidos
+    for(i in formatos) {
+      
+      # crear y guardar los heatmaps
+      match.fun(i)(paste(directorio_final, 
+                         "/",
+                         "Tukey_", 
+                         target, 
+                         "_",
+                         paste(normalizador, collapse = "_"), 
+                         ".", i, sep = ""),
+                   res = 600,
+                   width = 10000,
+                   height = 14000)
+      # crear y guardar el heatmpat euclidean
+      print(
+        
+        plot(x = tukey_DDCT_combinados,
+             cex.axis=1.1,
+             las = 3,
+             col = "blue",
+             sub = paste("tratamiento vs control", target, paste(normalizador, collapse = "_"), sep = " "),
+             xlim = c((ymin - 1), (ymax + 1))
+        )
+      )
+      #linea roja en x = 0
+      abline(v = 0, col="red")
+      
+      dev.off()
+      
+    }
+  }
+  
+  cat(paste("Se acaban de guardar la grafica de Tukey de: ",
+            target, "_", paste(normalizador, collapse = "_"), "_", tratamiento_condicion,
+            " en:\n", directorio_final, "\n\n",sep = ""))  
 }
 

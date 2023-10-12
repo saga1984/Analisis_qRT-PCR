@@ -126,6 +126,27 @@ guardar_tablas_qRT_PCR <- function(ruta,
                 row.names = FALSE)
     }
     
+    ######################  filtrar df para estadistica ########################
+    
+    clave_grafica <- "estadistica_df_global"
+    
+    # filtrar
+    df_estadistica <-  df_names[grepl(clave_grafica, df_names)]
+    
+    # Guardar cada data frame en un archivo CSV
+    for (df_name in df_estadistica) {
+      df <- get(df_name, envir = parent.frame())
+      write.csv(df, 
+                file = paste(directorio_final, 
+                             "/",
+                             df_name, 
+                             "_", 
+                             tratamiento_condicion,
+                             ".csv", 
+                             sep = ""),
+                row.names = FALSE)
+    }
+    
     ############# remover archivos, menos algunos seleccionados) ###############
     
     # eliminar todas las funciones de df_names

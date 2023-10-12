@@ -91,6 +91,13 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   # encontrar el valor del eje y mas alto
   ymax <- max(maximos)
   
+  # restar error y exp2DDCT_promedio
+  minimos <- tablas_grafica_combinados_func$exp2DDCT_promedio -
+    tablas_grafica_combinados_func$error
+  
+  # encontrar el valor del eje y mas alto
+  ymin <- min(minimos)
+  
   # definir formatos
   # formatos <- c("tiff", "jpeg")
   formatos <- c("jpeg")
@@ -100,7 +107,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     # guardar imagen en formatos pre-establecidos
     for(i in formatos) {
       
-      # crear y guardar los heatmaps
+      # crear y guardar la grafica principal
       match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condiciones, ".", i, sep = ""),
                    res = 300,
                    width = 5000,
