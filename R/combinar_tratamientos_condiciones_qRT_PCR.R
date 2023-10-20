@@ -88,14 +88,15 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   maximos <- tablas_grafica_combinados_func$exp2DDCT_promedio + 
     tablas_grafica_combinados_func$error
   
-  # encontrar el valor del eje y mas alto
-  ymax <- max(maximos)
-  
-  # restar error y exp2DDCT_promedio
-  minimos <- tablas_grafica_combinados_func$exp2DDCT_promedio -
+  # sumar error y exp2DDCT_promedio
+  sumar error y exp2DDCT_promedio
+  maximos <- tablas_grafica_combinados_func$exp2DDCT_promedio - 
     tablas_grafica_combinados_func$error
   
   # encontrar el valor del eje y mas alto
+  ymax <- max(maximos)
+  
+  # encontrar el valor del eje y mas bajo
   ymin <- min(minimos)
   
   # definir formatos
@@ -133,7 +134,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim(0, (ymax + (0.1 * ymax)))
+          ylim((ymin - (0.1 * ymin), (ymax + (0.1 * ymax)))
       )
       dev.off()
     }

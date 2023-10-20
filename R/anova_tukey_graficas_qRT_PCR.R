@@ -97,9 +97,13 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   # sumar error y exp2DDCT_promedio
   maximos <- promedio_grafica$exp2DDCT_promedio + promedio_grafica$error
   
-  # encontrar el valor del eje y mas alto
-  ymax <- max(maximos)
+  # sumar error y exp2DDCT_promedio
+  minimos <- promedio_grafica$exp2DDCT_promedio - promedio_grafica$error
   
+  # encontrar los valores del eje y mas alto y mas bajo
+  ymax <- max(maximos)
+  ymin <- min(minimos)
+    
   # si existe el subdirectorio
   if (dir.exists(directorio_final)) {
     # guardar imagen en formatos pre-establecidos
@@ -131,7 +135,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim(0, (ymax + (0.1 * ymax)))
+          ylim((ymin - (0.1 * ymin), (ymax + (0.1 * ymax)))
       )
       dev.off()
     }
