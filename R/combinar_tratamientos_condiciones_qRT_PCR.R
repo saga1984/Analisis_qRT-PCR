@@ -89,7 +89,6 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     tablas_grafica_combinados_func$error
   
   # sumar error y exp2DDCT_promedio
-  sumar error y exp2DDCT_promedio
   maximos <- tablas_grafica_combinados_func$exp2DDCT_promedio - 
     tablas_grafica_combinados_func$error
   
