@@ -120,7 +120,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                  x = ID,
                  y = exp2DDCT_promedio, 
                  fill = grupo)) +
-          geom_bar(stat = "identity", position = "stack") +
+          geom_bar(stat = "identity", position = "stack", color = "black") +
           # barras de error
           geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
                                       ymax = exp2DDCT_promedio + error/2),
@@ -233,12 +233,12 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
     # guardar imagen en formatos pre-establecidos
     for(i in formatos) {
 
-      # crear y guardar los heatmaps
+      # crear y guardar los Tukey
       match.fun(i)(paste(directorio_tratamientos, "/", "Tukey_",
                          tratamiento_condiciones, ".", i, sep = ""),
                    res = 600,
                    width = 10000,
-                   height = 14000)
+                   height = 20000)
       # crear y guardar el heatmpat euclidean
       print(
 
