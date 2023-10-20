@@ -135,7 +135,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim((ymin - (0.1 * ymin), (ymax + (0.1 * ymax)))
+          ylim((ymin - (0.1 * ymin)) , (ymax + (0.1 * ymax)))
       )
       dev.off()
     }
