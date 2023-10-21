@@ -180,7 +180,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
     }
   }
   
-  # crear nueva columna (exp_relat) aparte del estadistica df
+  # crear nueva columna (exp_relatexp2DDCT_promedio) aparte del estadistica df
   # crear vector vacio
   expresiones_relativas <- numeric()
   
@@ -195,7 +195,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   }
   
   # poblar tercera columna del nuevo df para estadisticos
-  estadistica_df[,"exp_relat"] <- expresiones_relativas
+  estadistica_df[,"exp2DDCT_promedio"] <- expresiones_relativas
   
   # volver global
   estadistica_df_global <<- estadistica_df
