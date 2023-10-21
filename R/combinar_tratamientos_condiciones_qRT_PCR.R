@@ -65,7 +65,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   # remover funciones de qRT_PCR
   todos_objetos <- todos_objetos[!grepl("qRT_PCR", todos_objetos)]
   
-  # filtrar por palabra clave "sd_conjunta"
+  # filtrar por palabra clave "tabla_grafica"
   filtrados_tablas_graficas <- todos_objetos[grep("tabla_grafica_", todos_objetos)]
   
   # crear listas de objetos por clave
@@ -147,14 +147,14 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   
   ################# obtener objetos de anovas en R #################
   
+  # Substring a buscar en el nombre de los archivos
+  substring_buscado <- "estadistica_df_global_"
+  
   # crear objetos de R (tablas para graficar)
   for (subdirectorio in vector_subcarpetas){
     
     # obtener directorio final
     directorio <- paste(ruta_carpeta, "/", subdirectorio, sep = "")
-    
-    # Substring a buscar en el nombre de los archivos
-    substring_buscado <- "DDCT_combinados_finales_"
     
     # Obtener la lista de archivos en el directorio que coinciden con el substring
     tabla_anova <- list.files(directorio, pattern = substring_buscado, full.names = TRUE)
