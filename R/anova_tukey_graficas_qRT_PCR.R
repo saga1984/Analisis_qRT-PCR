@@ -45,21 +45,21 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ################ crear columna con strings para agrupar ########################
   
   # crear columna con strings para agrupar
-  grupo <- data.frame(matrix(nrow = 2, ncol = 1))
+  Grupo <- data.frame(matrix(nrow = 2, ncol = 1))
   
   # indices de tratamiento. control
   TARGET <- which(grepl(target, promedio_grafica$ID))
   CNTRL <- which(grepl("Ctl", promedio_grafica$ID))
   
   # definir indices para agrupar
-  grupo[TARGET,] <- "Treatment"
-  grupo[CNTRL,] <- "Control"
+  Grupo[TARGET,] <- "Treatment"
+  Grupo[CNTRL,] <- "Control"
   
   # agregar nombre columna para agrupar
-  colnames(grupo) <- "grupo"
+  colnames(Grupo) <- "Grupo"
   
   # unir data frames 
-  promedio_grafica <- cbind(promedio_grafica, grupo)
+  promedio_grafica <- cbind(promedio_grafica, Grupo)
   
   ###################### agregar columna de  errores #############################
   
@@ -121,7 +121,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                mapping = aes(
                  x = ID,
                  y = exp2DDCT_promedio, 
-                 fill = grupo)) +
+                 fill = Grupo)) +
           geom_bar(stat = "identity", position = "stack", color = "black") +
           # barras de error
           geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
@@ -174,8 +174,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
       index <- (i - 1) * 3 + j
       
       # poblar primeras dos columnas de estadistica_df
-      estadistica_df[index, "id"] <- promedio_grafica_global$ID[i]
-      estadistica_df[index, "grupo"] <- promedio_grafica_global$grupo[i]
+      estadistica_df[index, "ID"] <- promedio_grafica_global$ID[i]
+      estadistica_df[index, "Grupo"] <- promedio_grafica_global$Grupo[i]
       
     }
   }
