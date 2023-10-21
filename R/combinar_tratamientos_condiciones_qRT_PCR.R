@@ -109,9 +109,9 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
       
       # crear y guardar la grafica principal
       match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condiciones, ".", i, sep = ""),
-                   res = 300,
-                   width = 5000,
-                   height = 7000)
+                   res = 400,
+                   width = 7000,
+                   height = 9000)
       # crear y guardar el heatmpat euclidean
       print(
         # graficar
@@ -128,7 +128,6 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                         position=position_dodge(.9)) +
           theme_minimal() +
           theme(legend.position = "none",
-                axis.text.x = element_text(angle = 45),
                 axis.text = element_text(size = 20)) +
           labs(x = "", y = "") +
           # cambiar colores
