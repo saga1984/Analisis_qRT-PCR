@@ -152,7 +152,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ##### preparar df #####
   
   # vector de nombre de columnas
-  nombres_col <- c("id", "grupo", "exp_relat")
+  nombres_col <- c("ID", "Grupo", "exp2DDCT_promedio")
   
   # vector de numero de filas
   numero_fil <- nrow(promedio_grafica_global) * 3
@@ -204,7 +204,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   
   
   # obtener ANOVA para funcion
-  anova_DDCT_combinados <- aov(exp_relat ~ id, 
+  anova_DDCT_combinados <- aov(exp2DDCT_promedio ~ ID, 
                                data = estadistica_df)
   
   # guardar texto de resultado de analisis de anova
