@@ -130,7 +130,6 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                         position=position_dodge(.9)) +
           theme_minimal() +
           theme(legend.position = "none",
-                axis.text.x = element_text(angle = 45),
                 axis.text = element_text(size = 20)) +
           labs(x = "", y = "") +
           # cambiar colores
@@ -236,8 +235,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   # hacer prueba de tukey
   tukey_DDCT_combinados <- TukeyHSD(x = anova_DDCT_combinados, conf.level = 0.95)
   
-  ymin <- min(anova_DDCT_combinados$effects)
-  ymax <- max(anova_DDCT_combinados$coefficients)
+  ymin <- min(tukey_DDCT_combinados$ID)
+  ymax <- max(tukey_DDCT_combinados$ID)
   
   # si existe subdirectorio
   if (dir.exists(directorio_final)) {
