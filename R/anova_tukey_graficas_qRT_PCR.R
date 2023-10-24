@@ -21,7 +21,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          target,
                                          normalizador,
                                          tratamiento,
-                                         formatos = "tiff"){
+                                         formatos = "jpeg",
+                                         resolucion = 300){
 
   # asignar subcarpeta para guardar resultados
   if(length(normalizador) > 1){
@@ -111,7 +112,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
       
       # crear y guardar graficas de expresion relativa
       match.fun(i)(paste(directorio_final, "/", "plot_", target, "_", paste(normalizador, collapse = "_"), ".", i, sep = ""),
-                   res = 400,
+                   res = resolucion,
                    width = 5000,
                    height = 7000)
       # crear y guardar el heatmpat euclidean
@@ -134,7 +135,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, (ymin - (0.1 * ymin)))  , (ymax + (0.1 * ymax)))
+          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, round((ymin - (0.1 * ymin)),digits = 0))  , 
+                round((ymax + (0.1 * ymax)), digits = 0)
       )
       dev.off()
     }
@@ -252,9 +254,9 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                          "_",
                          paste(normalizador, collapse = "_"), 
                          ".", i, sep = ""),
-                   res = 600,
+                   res = resolucion,
                    width = 10000,
-                   height = 20000)
+                   height = 22000)
       # crear y guardar el heatmpat euclidean
       print(
         

@@ -19,7 +19,9 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                                                       vector_subcarpetas,
                                                       tratamiento_condiciones,
                                                       target,
-                                                      normalizador){
+                                                      normalizador, 
+                                                      formatos = "jpeg",
+                                                      resolucion = 300){
   
   ##### crear subcarpeta para guardar resultadso de tratamientos condiciones #####
   
@@ -99,8 +101,6 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   ymin <- min(minimos)
   
   # definir formatos
-  # formatos <- c("tiff", "jpeg")
-  formatos <- c("jpeg")
   
   # si existe el subdirectorio
   if (dir.exists(directorio_tratamientos)) {
@@ -109,7 +109,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
       
       # crear y guardar la grafica principal
       match.fun(i)(paste(directorio_tratamientos, "/", "plot_", target, "_",paste(normalizador, collapse = "_"), "_", tratamiento_condiciones, ".", i, sep = ""),
-                   res = 400,
+                   res = resolucion,
                    width = 7000,
                    height = 9000)
       # crear y guardar el heatmpat euclidean
@@ -132,7 +132,8 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, (ymin - (0.1 * ymin)))  , (ymax + (0.1 * ymax)))
+          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, round((ymin - (0.1 * ymin)),digits = 0))  , 
+                round((ymax + (0.1 * ymax)), digits = 0)
       )
       dev.off()
     }
@@ -226,8 +227,6 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   if (dir.exists(directorio_tratamientos)) {
 
     # definir formatos
-    # formatos <- c("tiff", "jpeg")
-    formatos <- c("jpeg")
 
     # guardar imagen en formatos pre-establecidos
     for(i in formatos) {
@@ -235,9 +234,9 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
       # crear y guardar los Tukey
       match.fun(i)(paste(directorio_tratamientos, "/", "Tukey_",
                          tratamiento_condiciones, ".", i, sep = ""),
-                   res = 600,
+                   res = resolucion,
                    width = 10000,
-                   height = 20000)
+                   height = 22000)
       # crear y guardar el heatmpat euclidean
       print(
 
