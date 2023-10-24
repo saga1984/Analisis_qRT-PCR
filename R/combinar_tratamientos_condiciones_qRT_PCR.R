@@ -132,7 +132,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim((ymin - (0.1 * ymin)), (ymax + (0.1 * ymax)))
+          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, (ymin - (0.1 * ymin)))  , (ymax + (0.1 * ymax)))
       )
       dev.off()
     }

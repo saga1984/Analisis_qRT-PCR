@@ -93,7 +93,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
          promedio_grafica, envir = globalenv())
   
   ################################## GRAFICAR ####################################
-  
+  # promedio_grafica <- promedio_grafica_global
   # sumar error y exp2DDCT_promedio
   maximos <- promedio_grafica$exp2DDCT_promedio + promedio_grafica$error
   
@@ -122,7 +122,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                  x = ID,
                  y = exp2DDCT_promedio, 
                  fill = Grupo)) +
-          geom_bar(stat = "identity", position = "stack", color = "black") +
+          geom_bar(stat = "identity", color = "black") +
           # barras de error
           geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
                                       ymax = exp2DDCT_promedio + error/2),
@@ -134,7 +134,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
-          ylim((ymin - (0.1 * ymin)) , (ymax + (0.1 * ymax)))
+          ylim( ifelse((ymin - (0.1 * ymin)) > 0, 0, (ymin - (0.1 * ymin)))  , (ymax + (0.1 * ymax)))
       )
       dev.off()
     }
