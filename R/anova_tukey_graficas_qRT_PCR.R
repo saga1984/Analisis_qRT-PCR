@@ -15,7 +15,7 @@
 #' @export
 
 
-# tercera funcion para analisis de qRT PCR
+# cambio nomas tercera funcion para analisis de qRT PCR
 anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          tratamiento_condicion,
                                          target,
