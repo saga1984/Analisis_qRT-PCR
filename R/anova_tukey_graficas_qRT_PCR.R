@@ -124,7 +124,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                  x = ID,
                  y = exp2DDCT_promedio, 
                  fill = Grupo)) +
-          geom_bar(stat = "identity", color = "black") +
+          geom_bar(stat = "identity", color = "black", size = 1.2) +
           # barras de error
           geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
                                       ymax = exp2DDCT_promedio + error/2),
@@ -132,8 +132,8 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                         position=position_dodge(.9)) +
           theme_minimal() +
           theme(legend.position = "none",
-                axis.text = element_text(size = 24),
-                panel.border = element_rect(color = "black", fill = NA, size = 1)) +
+                axis.text = element_text(size = 28),
+                panel.border = element_rect(color = "black", fill = NA, size = 1.5)) +
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = color_boxplot) +
