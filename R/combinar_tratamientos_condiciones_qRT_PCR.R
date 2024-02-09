@@ -125,12 +125,12 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
           # barras de error
           geom_errorbar(mapping = aes(ymin = exp2DDCT_promedio - error/2,
                                       ymax = exp2DDCT_promedio + error/2),
-                        width=.2,
-                        position=position_dodge(.9)) +
+                        width = 0.6,
+                        position = position_dodge(.9)) +
           theme_minimal() +
           theme(legend.position = "none",
-                axis.text = element_text(size = 28),
-                panel.border = element_rect(color = "black", fill = NA, size = 1.5)) +
+                axis.text = element_text(size = 34),
+                panel.border = element_rect(color = "black", fill = NA, size = 2)) +
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = color_boxplot) +
