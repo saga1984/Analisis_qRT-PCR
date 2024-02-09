@@ -133,7 +133,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
           theme_minimal() +
           theme(legend.position = "none",
                 axis.text.x = element_text(size = 28),
-                axis.text.y = element_text(size = 42)
+                axis.text.y = element_text(size = 42),
                 panel.border = element_rect(color = "black", fill = NA, size = 3)) +
           labs(x = "", y = "") +
           # cambiar colores
