@@ -21,6 +21,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                                          target,
                                          normalizador,
                                          tratamiento,
+                                         color_boxplot = c("#56B4E9", "#E69F00"),
                                          formatos = "jpeg",
                                          resolucion = 300){
 
@@ -134,7 +135,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                 axis.text = element_text(size = 20)) +
           labs(x = "", y = "") +
           # cambiar colores
-          scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
+          scale_fill_manual(values = color_boxplot) +
           ylim(ifelse((ymin - (0.1 * ymin)) > 0, 0, floor((ymin - (0.1 * ymin))))  , 
                 round((ymax + (0.1 * ymax)), digits = 0))
       )
