@@ -101,7 +101,8 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   # encontrar el valor del eje y mas bajo
   ymin <- min(minimos)
   
-  # definir formatos
+  # convert to factor
+  promedio_grafica$ID <- as.factor(promedio_grafica$ID)
   
   # si existe el subdirectorio
   if (dir.exists(directorio_tratamientos)) {
@@ -118,7 +119,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
         # graficar
         ggplot(data = tablas_grafica_combinados_func, 
                mapping = aes(
-                 x = ID,
+                 x = rev(ID),
                  y = exp2DDCT_promedio, 
                  fill = Grupo)) +
           geom_bar(stat = "identity", color = "black", size = 1.2) +
@@ -127,7 +128,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
                                       ymax = exp2DDCT_promedio + error/2),
                         width = 0.2,
                         position = position_dodge(.9)) +
-          theme_minimal() +
+          theme_classic() +
           theme(legend.position = "none",
                 axis.text.x = element_text(size = 22),
                 axis.text.y = element_text(size = 42),

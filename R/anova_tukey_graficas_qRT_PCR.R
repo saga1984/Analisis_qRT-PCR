@@ -106,6 +106,9 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
   ymax <- max(maximos)
   ymin <- min(minimos)
     
+  # convert to factor
+  promedio_grafica$ID <- as.factor(promedio_grafica$ID)
+  
   # si existe el subdirectorio
   if (dir.exists(directorio_final)) {
     # guardar imagen en formatos pre-establecidos
@@ -121,7 +124,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
         # graficar
         ggplot(data = promedio_grafica, 
                mapping = aes(
-                 x = ID,
+                 x = rev(ID),
                  y = exp2DDCT_promedio, 
                  fill = Grupo)) +
           geom_bar(stat = "identity", color = "black", size = 1.2) +
@@ -130,7 +133,7 @@ anova_tukey_graficas_qRT_PCR <- function(ruta,
                                       ymax = exp2DDCT_promedio + error/2),
                         width = 0.2,
                         position=position_dodge(.9)) +
-          theme_minimal() +
+          theme_classic() +
           theme(legend.position = "none",
                 axis.text.x = element_text(size = 28),
                 axis.text.y = element_text(size = 42),
