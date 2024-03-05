@@ -102,7 +102,7 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
   ymin <- min(minimos)
   
   # convert to factor
-  promedio_grafica$ID <- as.factor(promedio_grafica$ID)
+  tablas_grafica_combinados_func$ID <- as.factor(tablas_grafica_combinados_func$ID)
   
   # si existe el subdirectorio
   if (dir.exists(directorio_tratamientos)) {
