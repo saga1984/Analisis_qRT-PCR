@@ -131,8 +131,8 @@ combinar_tratamientos_condiciones_qRT_PCR <- function(ruta_carpeta,
           theme_classic() +
           theme(legend.position = "none",
                 axis.text.x = element_text(size = 22),
-                axis.text.y = element_text(size = 42),
-                panel.border = element_rect(color = "black", fill = NA, size = 3)) +
+                axis.text.y = element_text(size = 42)) +
+        # panel.border = element_rect(color = "black", fill = NA, size = 3)
           labs(x = "", y = "") +
           # cambiar colores
           scale_fill_manual(values = color_boxplot) +
